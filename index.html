@@ -52,6 +52,43 @@
           <div><span>Value of the dotPoint : </span><span style="font-weight: bold;" id="x_value"></span></div>
           <div><span>Extra value of the dotPoint : </span><span style="font-weight: bold;" id="z_value"></span></div>
         </div>
+        
+        <h2>How to make it ?</h2>
+        <div Like this :</div>
+        <pre><code>                 var data = {
+        labels : ["January","February","March","April","May","June","July"],
+        datasets : [
+            {
+                fillColor : "rgba(220,220,220,0.5)",
+                strokeColor : "rgba(220,220,220,1)",
+                pointColor : "rgba(220,220,220,1)",
+                pointStrokeColor : "#fff",
+                data : [65,59,90,81,56,55,40],
+                z_data: ["1$ (for example)", "2$ (for example)", "3$ (for example)", "4$ (for example)", "5$ (for example)", "6$ (for example)", "7$ (for example)"]
+            },
+            {
+                fillColor : "rgba(151,187,205,0.5)",
+                strokeColor : "rgba(151,187,205,1)",
+                pointColor : "rgba(151,187,205,1)",
+                pointStrokeColor : "#fff",
+                data : [28,48,40,19,96,27,100],
+                z_data: ["11$ (for example)", "12$ (for example)", "13$ (for example)", "14$ (for example)", "15$ (for example)", "16$ (for example)", "17$ (for example)"]
+            }
+        ]
+    };
+
+
+
+    var ctx = document.getElementById("myChart").getContext("2d");
+    new Chart(ctx).Line(data, {
+        animation : true, 
+        callbackDotPoint: {
+            'mouseenter': function(data){ showData("mouseenter", data); },
+            'mouseleave': function(data){ showData("mouseleave", data); },
+            'click': function(data){ alert('click !'); showData("click", data); }
+        },
+        pointDotCursor: 'pointer' 
+    });</code></pre>
       </section>
     </div>
     <!--[if !IE]><script>fixScale(document);</script><![endif]-->
