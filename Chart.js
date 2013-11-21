@@ -813,7 +813,75 @@ window.Chart = function(context){
 		animationLoop(config,drawScale,drawLines,ctx);		
 		
 		function drawLines(animPc){
+		    if(config.pointDot && config.callbackDotPoint && animPc == 1){ // (animPc == 1) means the animation is finish
+                var 
+                    getActiveDotPoint = function(evt){
+                        var rect = ctx.canvas.getBoundingClientRect(),
+                            cursorPosition = { x: evt.clientX - rect.left, y: evt.clientY - rect.top },
+                            left,
+                            top;
+
+                        for(var i in mapDotPoints)
+                        {
+                            for(var k in mapDotPoints[i])
+                            {
+                                // Maybe we also could use the function ctx.isPointInPath(x, y) but 1) it's not compatible IE<9 with excanvas 2) Need rebuild the path every time (http://stackoverflow.com/a/7985246/2547632) 3) I'm not sure it can improve performance
+                                if( (left = mapDotPoints[i][k].x - config.pointDotRadius) <= cursorPosition.x 
+                                 && (mapDotPoints[i][k].x + config.pointDotRadius) >= cursorPosition.x
+                                 && (top = mapDotPoints[i][k].y - config.pointDotRadius) <= cursorPosition.y
+                                 && (mapDotPoints[i][k].y + config.pointDotRadius) >= cursorPosition.y)
+                                {
+                                    //Calculate the position of the top of the dotPoint compare the body of the page
+                                    mapDotPoints[i][k]['bodyX'] = (evt.clientX - (cursorPosition.x - left)) + config.pointDotRadius;
+                                    mapDotPoints[i][k]['bodyY'] = (evt.clientY - (cursorPosition.y - top));
+                                    return mapDotPoints[i][k];
+                                    
+                                }
+                            }
+                        }
+                        
+                        return false;
+                    },
+                    lastActiveDotPoint = false;
+                    
+                if(config.callbackDotPoint['click'])
+                    ctx.canvas.addEventListener('click', function(evt) { // Need to remove the last event listener before add one more
+                        if(!!(activeDotPoint = getActiveDotPoint(evt)))
+                            config.callbackDotPoint['click'](activeDotPoint);
+                    });
+                
+                ctx.canvas.addEventListener('mousemove', function(evt) { // Need to remove the last event listener before add one more
+                    
+                    var activeDotPoint = getActiveDotPoint(evt);
+                    
+                    if(!!activeDotPoint && !lastActiveDotPoint || !activeDotPoint && (!!lastActiveDotPoint || activeDotPoint !== lastActiveDotPoint))
+                    {
+                        if(!!activeDotPoint) // mouseenter
+                        {
+                            if(config.callbackDotPoint['mouseenter'])
+                                config.callbackDotPoint['mouseenter'](activeDotPoint);
+                            if(config.pointDotCursor)
+                                ctx.canvas.style.cursor = config.pointDotCursor.toString();
+                        }
+                        else // mouseleave
+                        {
+                            if(config.pointDotCursor)
+                                ctx.canvas.style.cursor = ''; // To find back original value
+                            if(config.callbackDotPoint['mouseleave'])
+                                config.callbackDotPoint['mouseleave'](lastActiveDotPoint);
+                        }
+                        
+                        lastActiveDotPoint = activeDotPoint;
+                    }
+                }, false);
+                
+            }
+            
+            var mapDotPoints = {};
+            
 			for (var i=0; i<data.datasets.length; i++){
+			    mapDotPoints[i] = {};
+			    
 				ctx.strokeStyle = data.datasets[i].strokeColor;
 				ctx.lineWidth = config.datasetStrokeWidth;
 				ctx.beginPath();
@@ -844,7 +912,15 @@ window.Chart = function(context){
 					ctx.lineWidth = config.pointDotStrokeWidth;
 					for (var k=0; k<data.datasets[i].data.length; k++){
 						ctx.beginPath();
-						ctx.arc(yAxisPosX + (valueHop *k),xAxisPosY - animPc*(calculateOffset(data.datasets[i].data[k],calculatedScale,scaleHop)),config.pointDotRadius,0,Math.PI*2,true);
+						mapDotPoints[i][k] = {
+                            x: yAxisPosX + (valueHop *k),
+                            y: xAxisPosY - animPc*(calculateOffset(data.datasets[i].data[k],calculatedScale,scaleHop)),
+                            x_value: data.datasets[i].data[k],
+                            id_dataset: i
+                        };
+                        if(data.datasets[i].z_data && data.datasets[i].z_data[k])
+                            mapDotPoints[i][k]['z_data'] = data.datasets[i].z_data[k];
+						ctx.arc(mapDotPoints[i][k].x,mapDotPoints[i][k].y,config.pointDotRadius,0,Math.PI*2,true);
 						ctx.fill();
 						ctx.stroke();
 					}
