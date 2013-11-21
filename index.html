@@ -39,7 +39,7 @@
         <ul></ul>
       </nav>
       <section>
-        <p>Please try and comment the pull request !</p>
+        <p>Please try and comment <a href="https://github.com/nnnick/Chart.js/issues/263">the issue</a> !</p>
         <canvas id="myChart" width="500" height="300"></canvas>
         <div id="info">
         <div><span>Last event : </span><span style="font-weight: bold;" id="last_event"></span></div>
@@ -53,9 +53,20 @@
           <div><span>Extra value of the dotPoint : </span><span style="font-weight: bold;" id="z_value"></span></div>
         </div>
         
+        <br/>
+        <h2>Why I think it's better than other code ?</h2>
+        <p><ul>
+          <li>It's a little code : only 77 lines added to Charts.js</li>
+          <li>it does not affect the performance unduly</li>
+          <li>I get the cursor location based on the canvas position so no trouble with position:relative, position:absolute, etc...</li>
+          <li>The code should be compatible with all browser including old IE</li>
+        </ul></p>
+        <br/>
         <h2>How to make it ?</h2>
+        <br/>
         <div Like this :</div>
-        <pre><code>                 var data = {
+        <br/>
+        <pre><code>var data = {
         labels : ["January","February","March","April","May","June","July"],
         datasets : [
             {
