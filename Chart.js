@@ -918,7 +918,7 @@ window.Chart = function(context){
                             x_value: data.datasets[i].data[k],
                             id_dataset: i
                         };
-                        if(data.datasets[i].z_data && data.datasets[i].z_data[k])
+                        if(data.datasets[i].z_data && data.datasets[i].z_data[k] !== undefined)
                             mapDotPoints[i][k]['z_value'] = data.datasets[i].z_data[k];
 						ctx.arc(mapDotPoints[i][k].x,mapDotPoints[i][k].y,config.pointDotRadius,0,Math.PI*2,true);
 						ctx.fill();
